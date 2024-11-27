@@ -9,8 +9,15 @@ class Category(models.Model):
     def __str__(self) -> str:
         return self.name
 
-class Tag(models.Models):
+class Tag(models.Model):
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Brand(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
 
     def __str__(self):
         return self.name
@@ -18,6 +25,7 @@ class Tag(models.Models):
 class Product(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.SET_NULL, null=True, blank=True)
+    brand = models.ForeignKey(Brand, related_name='products', on_delete=models.SET_NULL, null=True, blank=True)
     tags = models.ManyToManyField(Tag, related_name='products', blank=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
     description = models.TextField()
