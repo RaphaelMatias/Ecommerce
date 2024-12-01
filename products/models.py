@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator
 from users.models import CustomUser
@@ -45,6 +46,10 @@ class Review(models.Model):
     def __str__(self) -> str:
         return f'{self.user.username} avaliou {self.product.name} com {self.rating} estrelas'
 
+    def clean(self):
+        if Review.objects.filter(product=self.product, user=self.user).exists():
+            raise ValidationError("Você já avaliou este produto.")
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.SET_NULL, null=True, blank=True)
@@ -67,10 +72,16 @@ class Product(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    def clean(self):
+        if self.discount_price and self.discount_price > self.price:
+            raise ValidationError("O preço com desconto não pode ser maior que o preço original.")
+
     @property
     def is_available(self):
         return self.stock > 0
 
     @property
     def final_price(self):
-        return self.discount_price if self.discount_price else self.price
+        if self.discount_price and self.discount_price > 0:
+            return self.discount_price
+        return self.price
