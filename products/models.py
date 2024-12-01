@@ -6,12 +6,17 @@ from users.models import CustomUser
 class Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subcategories')
 
     def __str__(self) -> str:
         return self.name
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -48,6 +53,7 @@ class Product(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
+    discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     stock = models.PositiveIntegerField()
     image = models.ImageField(upload_to='products', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,3 +70,7 @@ class Product(models.Model):
     @property
     def is_available(self):
         return self.stock > 0
+
+    @property
+    def final_price(self):
+        return self.discount_price if self.discount_price else self.price
