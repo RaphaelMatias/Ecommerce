@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator
+from users.models import CustomUser
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -21,6 +22,23 @@ class Brand(models.Model):
 
     def __str__(self):
         return self.name
+
+class Review(models.Model):
+    class RatingChoices(models.IntegerChoices):
+        ONE_STAR = 1, '1 estrela'
+        TWO_STARS = 2, '2 estrelas'
+        THREE_STARS = 3, '3 estrelas'
+        FOUR_STARS = 4, '4 estrelas'
+        FIVE_STARS = 5, '5 estrelas'
+
+    product = models.ForeignKey('Product', related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=RatingChoices.choices)
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.user.username} avaliou {self.product.name} com {self.rating} estrelas'
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
