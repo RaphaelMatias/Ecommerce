@@ -25,9 +25,19 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'brand', 'price', 'stock', 'created_at', 'updated_at')
-    list_filter = ('category', 'brand', 'created_at', 'updated_at')
+    list_display = ('name', 'category', 'brand', 'price', 'stock', 'is_active', 'created_at', 'updated_at')
+    list_filter = ('category', 'brand', 'created_at', 'updated_at', 'is_active')
     search_fields = ('name', 'description', 'category__name', 'brand__name')
     prepopulated_fields = {'slug':('name',)}
     autocomplete_fields = ('category', 'brand', 'tags')
     readonly_fields = ('created_at', 'updated_at')
+
+    actions = ['make_available', 'make_unavailable']
+
+    @admin.action(description='Marcar produtos como disponíveis')
+    def make_available(self, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description='Marcar produtos como indisponíveis')
+    def make_unavailable(self, request, queryset):
+        queryset.update(is_active=False)
