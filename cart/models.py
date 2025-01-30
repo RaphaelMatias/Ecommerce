@@ -5,6 +5,11 @@ from products.models import Product
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
+    is_paid = models.BooleanField(default=False)
+
+    def clear_cart(self):
+        if self.is_paid:
+            self.items.all().delete()
 
     @property
     def total_price(self):
