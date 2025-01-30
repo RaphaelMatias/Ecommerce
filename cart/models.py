@@ -37,6 +37,7 @@ class CartItem(models.Model):
             
             if new_quantity > self.product.stock:
                 new_quantity = self.product.stock
+                self.quantity = new_quantity
             existing_item.quantity = new_quantity
             existing_item.save()
         except CartItem.DoesNotExist:
