@@ -6,11 +6,15 @@ class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def total_price(self):
+        return sum(item.total_price for item in self.items.all())
+
     def __str__(self):
         return f'Carrinho de {self.user.username}'
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, related_name='itens', on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     is_selected = models.BooleanField(default=True)
