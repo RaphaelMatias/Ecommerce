@@ -20,5 +20,10 @@ class CartItem(models.Model):
     def total_price(self):
         return self.product.final_price * self.quantity
 
+    def save(self, *args, **kwargs):
+        if self.quantity > self.product.stock:
+            self.quantity = self.product.stock
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.quantity} x {self.product.name}'
