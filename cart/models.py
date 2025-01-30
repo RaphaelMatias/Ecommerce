@@ -9,7 +9,8 @@ class Cart(models.Model):
 
     def clear_cart(self):
         if self.is_paid:
-            self.items.all().delete()
+            raise ValueError('Não é possivel limpar um carrinho que já foi pago')
+        self.items.all().delete()
 
     @property
     def total_price(self):
@@ -30,18 +31,18 @@ class CartItem(models.Model):
         return self.product.final_price * self.quantity
 
     def save(self, *args, **kwargs):
-        existing_item = CartItem.objects.filter(cart=self.cart, product=self.product).first()
-
-        if existing_item:
+        try:
+            existing_item = CartItem.objects.get(cart=self.cart, product=self.product)
             new_quantity = existing_item.quantity + self.quantity
+            
             if new_quantity > self.product.stock:
                 new_quantity = self.product.stock
             existing_item.quantity = new_quantity
             existing_item.save()
-        else:
-            if self.quantity > self.product.stock:
-                self.quantity = self.product.stock
-            super().save(*args, **kwargs)
+        except CartItem.DoesNotExist:
+                if self.quantity > self.product.stock:
+                    self.quantity = self.product.stock
+                super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.quantity} x {self.product.name}'
