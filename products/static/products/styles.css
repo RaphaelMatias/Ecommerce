@@ -1,0 +1,33 @@
+/* products/static/products/styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+header {
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+}
+
+
+.card {
+    transition: transform 0.3s ease-in-out;
+}
+
+.card img{
+    height: 250px;
+    object-fit: cover;
+}
+
+.card:hover {
+    transform: scale(1.1);
+}
+
+footer {
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+    margin-top: 50px;
+}
