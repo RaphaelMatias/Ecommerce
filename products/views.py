@@ -19,7 +19,3 @@ class ProductViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated and self.request.user.is_staff:
             return Product.objects.all()
         return Product.objects.filter(is_active=True, stock__gt=0)
-
-def product_list(request):
-    products = Product.objects.filter(is_active=True, stock__gt=0)
-    return render(request, 'products/products_list.html', {'products': products})
