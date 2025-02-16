@@ -25,8 +25,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'user', 'rating', 'comment', 'created_at']
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=False)
-    brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all(), required=False)
+    category = serializers.StringRelatedField()
+    brand = serializers.StringRelatedField()
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, required=False)
     reviews = ReviewSerializer(many=True, read_only=True)
     related_products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
