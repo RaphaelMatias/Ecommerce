@@ -64,6 +64,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    related_products = models.ManyToManyField('self', blank=True, verbose_name='Produtos relacionados')
 
     def __str__(self):
         return self.name

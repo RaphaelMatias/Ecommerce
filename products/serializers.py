@@ -29,11 +29,12 @@ class ProductSerializer(serializers.ModelSerializer):
     brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all(), required=False)
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, required=False)
     reviews = ReviewSerializer(many=True, read_only=True)
+    related_products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'category', 'brand', 'tags', 'slug', 'description',
             'price', 'discount_price', 'stock', 'image', 'is_available', 'final_price',
-            'created_at', 'updated_at', 'reviews'
+            'created_at', 'updated_at', 'reviews', 'related_products'
         ]
