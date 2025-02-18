@@ -1,15 +1,19 @@
 from django.db import models
 from django.forms import ValidationError
 from django.utils.text import slugify
+from mptt.models import MPTTModel, TreeForeignKey
 from django.core.validators import MinValueValidator
 from users.models import CustomUser
 
-class Category(models.Model):
+class Category(MPTTModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subcategories')
+    parent = TreeForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
 
-    def __str__(self) -> str:
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+    def __str__(self):
         return self.name
 
 class Tag(models.Model):
