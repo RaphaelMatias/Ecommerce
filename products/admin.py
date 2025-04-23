@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Tag, Brand, Review, Product
+from .models import Category, Tag, Brand, Review, Product, Color, Size, ProductVariant
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -23,9 +23,25 @@ class ReviewAdmin(admin.ModelAdmin):
     list_filter = ('rating', 'created_at')
     search_fields = ('user__username', 'product__name')
 
+@admin.register(Color)
+class ColorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'hex_code')
+    ordering = ('name',)
+
+@admin.register(Size)
+class SizeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'order')
+    ordering = ('order',)
+    search_fields = ('name',)
+
+class ProductVariantInline(admin.TabularInline):
+    model = ProductVariant
+    extra = 1
+    autocomplete_fields = ['color', 'size']
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'brand', 'price', 'stock', 'is_active', 'created_at', 'updated_at')
+    list_display = ('name', 'category', 'brand', 'price', 'total_stock', 'is_active', 'created_at', 'updated_at')
     list_filter = ('category', 'brand', 'created_at', 'updated_at', 'is_active')
     search_fields = ('name', 'description', 'category__name', 'brand__name')
     prepopulated_fields = {'slug':('name',)}
@@ -33,6 +49,10 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
     actions = ['make_available', 'make_unavailable']
+
+    @admin.display(description='Estoque Total')
+    def total_stock(self, obj):
+        return sum(variant.stock for variant in obj.variants.all())
 
     @admin.action(description='Marcar produtos como disponíveis')
     def make_available(self, request, queryset):
